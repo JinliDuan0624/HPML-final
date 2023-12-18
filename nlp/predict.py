@@ -14,7 +14,8 @@ def predict(text, model, tokenizer):
     with torch.no_grad():
         outputs = model(**inputs)
     logits = outputs.logits
-    return torch.argmax(logits, dim=-1).item()  # 返回概率最高的类别标签
+    probabilities = softmax(logits, dim=-1).squeeze()
+    return probabilities.tolist()  # 返回每个类别的概率列表
 
 
 # 示例用法
