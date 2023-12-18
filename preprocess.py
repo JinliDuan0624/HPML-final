@@ -1,5 +1,6 @@
 import os
 import csv
+from sklearn.model_selection import train_test_split
 
 # Define the categories and their labels
 categories = {
@@ -44,19 +45,26 @@ def process_category(category, label):
                 })
     return data
 
-def write_csv(data):
-    keys = data[0].keys()
-    with open('dataset.csv', 'w', newline='', encoding='utf-8') as output_file:
-        dict_writer = csv.DictWriter(output_file, keys)
-        dict_writer.writeheader()
-        dict_writer.writerows(data)
+
 
 def main():
     all_data = []
     for category, label in categories.items():
         all_data.extend(process_category(category, label))
 
-    write_csv(all_data)
+    # 将数据切分为训练集和测试集
+    train_data, test_data = train_test_split(all_data, test_size=0.1, random_state=42)
+
+    # 分别写入训练集和测试集数据到CSV文件
+    write_csv(train_data, 'train_output.csv')
+    write_csv(test_data, 'test_output.csv')
+
+def write_csv(data, filename):
+    keys = data[0].keys()
+    with open(filename, 'w', newline='', encoding='utf-8') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(data)
 
 if __name__ == "__main__":
     main()
