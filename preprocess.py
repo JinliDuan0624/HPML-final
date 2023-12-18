@@ -56,8 +56,8 @@ def main():
     train_data, test_data = train_test_split(all_data, test_size=0.1, random_state=42)
 
     # 分别写入训练集和测试集数据到CSV文件
-    write_csv(train_data, 'train_output.csv')
-    write_csv(test_data, 'test_output.csv')
+    write_csv(train_data, './TrainTest/train_output.csv')
+    write_csv(test_data, './TrainTest/test_output.csv')
 
 def write_csv(data, filename):
     keys = data[0].keys()
