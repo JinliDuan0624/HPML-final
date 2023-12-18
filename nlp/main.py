@@ -3,10 +3,16 @@ import pandas as pd
 from data_preparation import load_and_preprocess_data
 from train_and_evaluate import train_and_evaluate
 from predict import load_model, predict
+from sklearn.metrics import accuracy_score
+
 
 def batch_predict(model, tokenizer, descriptions):
-    predictions = [predict(desc, model, tokenizer) for desc in descriptions]
-    return predictions
+    return [predict(desc, model, tokenizer) for desc in descriptions]
+def evaluate(model, tokenizer, descriptions, true_labels):
+    predictions = batch_predict(model, tokenizer, descriptions)
+    accuracy = accuracy_score(true_labels, predictions)
+    return accuracy
+
 
 def main():
     currentdataset='train'
@@ -35,6 +41,11 @@ def main():
         # 读取 CSV 文件
         test_dataset = pd.read_csv(dataset_path)
         descriptions = test_dataset['text'].tolist()
+        true_labels = test_dataset['Label'].tolist()  # 确保CSV文件有一个名为'label'的列，包含真实标签
+
+        # 计算准确率
+        accuracy = evaluate(model, tokenizer, descriptions, true_labels)
+        print(f"Test Accuracy: {accuracy}")
 
         # 进行批量预测
         predictions = batch_predict(model, tokenizer, descriptions)
