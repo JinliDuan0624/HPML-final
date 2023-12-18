@@ -21,7 +21,7 @@ def evaluate(model, tokenizer, descriptions, true_labels):
 
 
 def main():
-    currentdataset='train'
+    currentdataset='test'
     dataset_path = "./dataset/TrainTest/"+currentdataset+"_dataset.csv"
     model_path = "trained_model"
     num_labels = 6  # 根据你的任务调整这个值
