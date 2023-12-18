@@ -12,7 +12,7 @@ def main():
     currentdataset='train'
     dataset_path = "./dataset/TrainTest/"+currentdataset+"_dataset.csv"
     model_path = "trained_model"
-    num_labels = 2  # 根据你的任务调整这个值
+    num_labels = 6  # 根据你的任务调整这个值
 
     # 检查命令行参数来确定执行哪个部分
     if len(sys.argv) < 2:
@@ -34,7 +34,7 @@ def main():
 
         # 读取 CSV 文件
         test_dataset = pd.read_csv(dataset_path)
-        descriptions = test_dataset['Description'].tolist()
+        descriptions = test_dataset['text'].tolist()
 
         # 进行批量预测
         predictions = batch_predict(model, tokenizer, descriptions)
