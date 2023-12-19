@@ -1,39 +1,43 @@
 import pandas as pd
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import f1_score
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Load the dataset
+# 设置数据集的文件路径
 file_path = './TrainTest/test_dataset.csv'
-data = pd.read_csv(file_path)
 
-# Calculate ROC curve and AUC for each score
-fpr_nlp, tpr_nlp, _ = roc_curve(data['Label'], data['NLPscores'])
-auc_nlp = auc(fpr_nlp, tpr_nlp)
+# 读取CSV文件
+test_df = pd.read_csv(file_path)
 
-fpr_cv, tpr_cv, _ = roc_curve(data['Label'], data['CVscores'])
-auc_cv = auc(fpr_cv, tpr_cv)
+# 假设 'Label' 列是真实标签，并且所有的模型预测列都已经是二进制的类别预测
+# 计算每个模型的F1分数
+model_columns = ['NLP', 'CV', 'LinearRegression', 'RandomForest', 'LogisticRegression', 'SVC', 'WeightedAverage']
+f1_scores = {}
 
-fpr_ir, tpr_ir, _ = roc_curve(data['Label'], data['IRscores'])
-auc_ir = auc(fpr_ir, tpr_ir)
+for model in model_columns:
+    f1_scores[model] = f1_score(test_df['Label'], test_df[model], average='micro')  # 使用'micro'来计算总体的F1分数
 
-fpr_wa, tpr_wa, _ = roc_curve(data['Label'], data['WAscores'])
-auc_wa = auc(fpr_wa, tpr_wa)
+# 将F1分数转换为数据框架，以便于绘图
+f1_scores_df = pd.DataFrame(list(f1_scores.items()), columns=['Model', 'F1 Score'])
 
-fpr_rf, tpr_rf, _ = roc_curve(data['Label'], data['RFscores'])
-auc_rf = auc(fpr_rf, tpr_rf)
+# 绘制F1分数图表
+plt.figure(figsize=(10, 6))
+barplot = sns.barplot(x='Model', y='F1 Score', data=f1_scores_df)
+plt.title('F1 Scores for Different Models')
+plt.xticks(rotation=45)
+plt.ylabel('F1 Score')
+plt.xlabel('Model')
 
-# Plotting ROC curves
-plt.figure(figsize=(10, 8))
-plt.plot(fpr_nlp, tpr_nlp, color='blue', lw=2, label=f'NLP Score ROC curve (area = {auc_nlp:.6f})')
-plt.plot(fpr_cv, tpr_cv, color='green', lw=2, label=f'CV Score ROC curve (area = {auc_cv:.6f})')
-plt.plot(fpr_ir, tpr_ir, color='orange', lw=2, label=f'IR Score ROC curve (area = {auc_ir:.6f})')
-plt.plot(fpr_wa, tpr_wa, color='purple', lw=2, label=f'WA Score ROC curve (area = {auc_wa:.6f})')
-plt.plot(fpr_rf, tpr_rf, color='brown', lw=2, label=f'RF Score ROC curve (area = {auc_rf:.6f})')
-plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC)')
-plt.legend(loc="lower right")
+# 在条形上添加分数标签
+for p in barplot.patches:
+    barplot.annotate(format(p.get_height(), '.1%'),  # 转换为百分比格式
+                     (p.get_x() + p.get_width() / 2., p.get_height()),
+                     ha = 'center', va = 'center',
+                     xytext = (0, 9),
+                     textcoords = 'offset points')
+
+plt.tight_layout()  # 确保标签不会重叠
 plt.show()
+
+# 输出计算的F1分数，以便检查
+f1_scores_df
